@@ -1,0 +1,99 @@
+name: Deploy Multi-Container
+
+on:
+  push:
+    branches: ["main", "develop"]
+
+env:
+  DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      #Nos descargamos el código
+      - uses: actions/checkout@v4
+
+      # 1. Generar Documentación 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install && npx jsdoc -d docs_generated src/js/
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 2. Construir y Subir Imagen NGINX
+      - name: Build Nginx
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/nginx/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/examen-nginx:latest
+
+      # 3. Construir y Subir Imagen PHP
+      - name: Build PHP
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/php/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/examen-php:latest
+
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Paramos lo que haya
+            docker compose down || true
+
+            # Actualizamos las imágenes
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/examen-nginx:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/examen-php:latest
+
+            # Creamos el docker-compose.yml en el servidor 
+            # (Opcion que me funciona aunque quizas no sea la mas optima)
+            cat <<EOF > docker-compose.yml
+            version: '3.8'
+            services:
+              app-php:
+                image: ${{ secrets.DOCKERHUB_USERNAME }}/examen-php:latest
+                container_name: contenedor-php
+                restart: unless-stopped
+                networks:
+                  - daw-network
+                volumes:
+                  - app-data:/var/www/html/uploads
+              web-nginx:
+                image: ${{ secrets.DOCKERHUB_USERNAME }}/examen-nginx:latest
+                container_name: contenedor-nginx
+                ports:
+                  - "80:80"
+                  - "443:443"
+                depends_on:
+                  - app-php
+                networks:
+                  - daw-network
+                volumes:
+                  - app-data:/var/www/html/uploads
+                  - /etc/letsencrypt:/etc/letsencrypt:ro
+            networks:
+              daw-network:
+                driver: bridge
+            volumes:
+              app-data:
+            EOF
+
+            # Arrancamos todo
+            docker compose up -d

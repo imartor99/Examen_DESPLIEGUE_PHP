@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # Servicio 1: El Servidor de Aplicaciones (PHP)
+  app-php:
+    image: ${{DOCKER_USER}}/examen-php:latest
+    container_name: contenedor-php
+    restart: unless-stopped # reinicia automáticamente un contenedor si este se detiene, falla o si el demonio de Docker se reinicia
+    # No exponemos puertos al exterior, solo a la red interna
+    networks:
+      - daw-network
+    # Volumen compartido 
+    volumes:
+      - app-data:/var/www/html/uploads
+
+  # Servicio 2: El Servidor Web (Nginx)
+  web-nginx:
+    image: ${{DOCKER_USER}}/examen-nginx:latest
+    container_name: contenedor-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app-php # Espera a que PHP arranque
+    networks:
+      - daw-network
+    # El mismo volumen, para que Nginx pueda servir archivos subidos por PHP
+    volumes:
+      - app-data:/var/www/html/uploads
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+
+# Definimos la red privada
+networks:
+  daw-network:
+    driver: bridge
+
+# Definimos el volumen persistente
+volumes:
+  app-data:

@@ -1,0 +1,11 @@
+{
+  "name": "proyecto-examen-daw",
+  "version": "1.0.0",
+  "description": "Proyecto de práctica para despliegue",
+  "scripts": {
+    "doc": "jsdoc -c jsdoc.json"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.2"
+  }
+}
