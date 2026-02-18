@@ -18,7 +18,7 @@ networks:
 
 ## Funcionamiento del despliegue de todo el proyecto
 
-- En primer lugar preparamos nuestro ecosistema con un workflow de actions en el cual copiamos todo el contenido del repositorio, generamos la documentacion automatica con JSDoc alojada finalmente en https://www.nachodaw.com , y creamos tantos las imagenes de Ngingx como de PHP-FPM para subirlas a docker-hub. 
+- En primer lugar preparamos nuestro ecosistema con un workflow de actions en el cual copiamos todo el contenido del repositorio, generamos la documentacion automatica con JSDoc alojada finalmente en https://www.nachodaw.com/docs , y creamos tantos las imagenes de Ngingx como de PHP-FPM para subirlas a docker-hub. 
 
 - Posteriormente, hacemos otro jobs en el que entramos en nuestra ec2 por ssh, creo el docker-compose manualmente ahi, se que no es lo correcto y que tiene poco sentido, pero ha sido la unica forma en la que consigo el despliegue con éxito; el docker-compose local me sirvio para el testeo del funcionamiento en fase de pruebas. Volviendo a lo anterior, el docker-compose creado manualmente en la ec2 levanta dos dockers para cada servidor y descargar a cada uno su imagen correspondiente previamente creada y subida.
 
@@ -27,4 +27,6 @@ networks:
 -Finalmente levantamos todo con docker-compose up.
 ------------------------------------------------------------
 Este en mi primer intento sin IP elastica.
+-------------------------------------------------------
 
+URL del REPOSITORIO: https://github.com/imartor99/Examen_DESPLIEGUE_PHP
