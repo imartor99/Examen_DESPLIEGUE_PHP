@@ -24,11 +24,11 @@ networks:
 
 - En los dockerfile individuales de cada server lo unico que hacemos es bajar la imagen, siempre la ultima versión, se copia sus archivos necesarios cada uno de su parte y en uno de ellos otorgamos permisos.
 
--Finalmente levantamos todo con docker-compose up.
+- Finalmente levantamos todo con docker-compose up.
 ------------------------------------------------------------
-Este en mi primer intento sin IP elastica.
-
-ACTUALIZO: Tras mirar la documentacion de AWS, asignamos una ip elastica a nuestra EC2. Para ello hemos creado primero, en el apartado Red y seguridad, IP elásticas, una ip elastica, y luego la hemos asociado a nuestra EC2 del examen ya creado y en estado RUNNING. Tras ello, he cambiado tanto lo registros de mi DNS, así como el secrets que hace referencia al EC2_HOST con la ip de la instancia. Hechos los cambios, relanzo el workflow de nuevo y observamos como la web se sigue viendo perfectamente en nuestra URL securizada con funcionamiento perfecto, demostrando asi que esta funcionando la conexion entre nuestro servidor de aplicaciones y el web.
+- Este en mi primer intento sin IP elastica.
+## ACTUALIZO: Implemento Ip elástica
+Tras mirar la documentacion de AWS, asignamos una ip elástica a nuestra EC2. Para ello hemos creado primero, en el apartado Red y seguridad, IP elásticas, una ip elástica, y luego la hemos asociado a nuestra EC2 del examen ya creado y en estado RUNNING. Tras ello, he cambiado tanto lo registros de mi DNS, así como el secrets que hace referencia al EC2_HOST con la ip de la instancia. Hechos los cambios, relanzo el workflow de nuevo y observamos como la web se sigue viendo perfectamente en nuestra URL securizada con funcionamiento perfecto, demostrando asi que esta funcionando la conexion entre nuestro servidor de aplicaciones y el web.
 -------------------------------------------------------
 
 URL del REPOSITORIO: https://github.com/imartor99/Examen_DESPLIEGUE_PHP
