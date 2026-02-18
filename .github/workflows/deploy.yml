@@ -2,7 +2,7 @@ name: Deploy Multi-Container
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: ["main"]
 
 env:
   DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
